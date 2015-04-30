@@ -74,7 +74,7 @@ class FilterTrackConsumer extends OauthPhirehose
         $player2["text"] = str_replace(" ", "", $player2["text"] );
         $player1_hp = 0;
         $player2_hp = 0;
-        while($player1_hp <= 16 || $player2_hp <= 16){
+        while($player1_hp <= 16 && $player2_hp <= 16){
             $player1win = $this->WinLose(mb_substr($player1['text'], $player1_hp,1), mb_substr($player2['text'], $player1_hp, 1));
             $player2win = $this->WinLose(mb_substr($player2['text'], $player2_hp,1), mb_substr($player1['text'], $player2_hp, 1));
             if($player1win == false) {
@@ -96,14 +96,14 @@ class FilterTrackConsumer extends OauthPhirehose
             //プレイヤ1勝利時の処理
             $plusminus = 0.5 * ($player2_point - $player1_point) + $remain1 * 100;
             $this->redis->zIncrBy('points', $plusminus, $player1['user']['screen_name']);
-            $this -> redis -> zIncrBy('points', 0-$plusminus, $player2['user']['screen_name']);
+            $this->redis->zIncrBy('points', 0-$plusminus, $player2['user']['screen_name']);
             print("player1の勝ちです¥n");
 
         } else if($remain2 > $remain1) {
             //プレイヤ2勝利時の処理
             $plusminus = 0.5 * ($player1_point - $player2_point) + $remain2 * 100;
-            $this -> redis -> zIncrBy('points', $plusminus, $player2['user']['screen_name']);
-            $this -> redis -> zIncrBy('points', 0-$plusminus, $player1['user']['screen_name']);
+            $this->redis->zIncrBy('points', $plusminus, $player2['user']['screen_name']);
+            $this->redis->zIncrBy('points', 0-$plusminus, $player1['user']['screen_name']);
             print("player2の勝ちです¥n");
         }
         print("player1の残り文字数は".$remain1."です。¥player2の残り文字数は".$remain2."です。¥n");
