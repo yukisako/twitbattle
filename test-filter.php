@@ -1,7 +1,8 @@
 <?php
 require_once('./phirehose-master/lib/Phirehose.php');
 require_once('./phirehose-master/lib/OauthPhirehose.php');
-
+require_once('./TwitterOauth/autoload.php');
+use Abraham\TwitterOAuth\TwitterOAuth;
 /**
  * Example of using Phirehose to display a live filtered stream using track words
  */
@@ -11,11 +12,18 @@ class FilterTrackConsumer extends OauthPhirehose
 {
     public $tweets = array();
     public $redis;
+    public $twOauth;
+    public $faces;
 
     public function __construct($oauth_token, $oauth_secret, $filter_method) {
         parent::__construct($oauth_token, $oauth_secret, $filter_method);
         $this->redis = new Redis();
         $this -> redis -> connect('127.0.0.1',6379);
+        $this -> twOauth = new TwitterOauth(TWITTER_CONSUMER_KEY,TWITTER_CONSUMER_SECRET,OAUTH_TOKEN,OAUTH_SECRET);
+        $this->faces = json_decode(file_get_contents("face.json"));
+//        $res = $this -> twOauth -> post("statuses/update", array("status" => "@musou1500 テスト"));
+//        var_dump($res);
+
     }
 
     /**
@@ -41,21 +49,42 @@ class FilterTrackConsumer extends OauthPhirehose
             $textdata = explode(" ", urldecode($data['text']));
             if(count($textdata) !== 3){
                 echo "不正なフォーマットです\n";
+
+
+
+                $this -> twOauth -> post("statuses/update", array("status" => "@".$data['user']['screen_name']."\n 不正なフォーマットです".$this->getface()."\n5 7 5で投稿してください".$this->getface()));
+
+
+
                 return;
             }
-            if(!((mb_strlen($textdata[0]) == 5) && (mb_strlen($textdata[1]) == 7)&& (mb_strlen($textdata[2]) == 5))) {
-                echo mb_strlen($textdata[0]).",";
-                echo mb_strlen($textdata[1]).",";
-                echo mb_strlen($textdata[2])."\n";
+
+            if(!((mb_strlen($textdata[0],'UTF-8') == 5) && (mb_strlen($textdata[1],'UTF-8') == 7)&& (mb_strlen($textdata[2],'UTF-8') == 5))) {
+                echo mb_strlen($textdata[0],'UTF-8').",";
+                echo mb_strlen($textdata[1],'UTF-8').",";
+                echo mb_strlen($textdata[2],'UTF-8')."\n";
                 return ;
+                $this -> twOauth -> post("statuses/update", array("status" => "@".$data['user']['screen_name']."\n 不正なフォーマットです".$this->getface()."\n5 7 5で投稿してください".$this->getface()));
             }
+
+
+            echo "エントリーOK\n";
+            $this -> twOauth -> post("statuses/update", array("status" => "@".$data['user']['screen_name']."\n TwitBattleにエントリーしました".$this->getface()));
+
+
 
             if(count($this -> tweets) >= 1){
                 if($data['user']['screen_name'] == $this->tweets[0]['user']['screen_name']){
                     $this -> tweets[0] = $data;
-                    print("この人はすでにDataに入っているので更新処理を行います。¥n");
+
+
+
+                    $this -> twOauth -> post("statuses/update", array("status" => "@".$data['user']['screen_name']."\n すでにエントリー済みですヾ\n".$this->getface()."既存のエントリーを削除し、更新処理を行いました".$this->getface()));
+
+
+
                 } else {
-                    print($data['user']['screen_name']."と".$this->tweets[0]['user']['screen_name']."が対戦します。¥n");
+                    print($data['user']['screen_name']."と".$this->tweets[0]['user']['screen_name']."が対戦します\n");
                     $this->battledata($this->tweets[0], $data);
                     $this->tweets = array();
                 }
@@ -75,13 +104,16 @@ class FilterTrackConsumer extends OauthPhirehose
         $player1_hp = 0;
         $player2_hp = 0;
         while($player1_hp <= 16 && $player2_hp <= 16){
-            $player1win = $this->WinLose(mb_substr($player1['text'], $player1_hp,1), mb_substr($player2['text'], $player1_hp, 1));
-            $player2win = $this->WinLose(mb_substr($player2['text'], $player2_hp,1), mb_substr($player1['text'], $player2_hp, 1));
+            $player1win = $this->WinLose(mb_substr($player1['text'], $player1_hp,1), mb_substr($player2['text'], $player2_hp, 1));
+            $player2win = $this->WinLose(mb_substr($player2['text'], $player2_hp,1), mb_substr($player1['text'], $player1_hp, 1));
             if($player1win == false) {
                 $player1_hp++;
+                echo "player1の体力は".$player1_hp."\n";
+
             }
             if($player2win == false){
                 $player2_hp++;
+                echo "player2の体力は".$player2_hp."\n";
             }
         }
         $player1_point = $this -> getUserData($player1['user']["screen_name"]);
@@ -90,23 +122,35 @@ class FilterTrackConsumer extends OauthPhirehose
         $player1_point = $player1_point['point'];
         $player2_point = $player2_point['point'];
 
-        $remain1 = 16 - $player1_hp;
-        $remain2 = 16 - $player2_hp;
+        $remain1 = 17 - $player1_hp;
+        $remain2 = 17 - $player2_hp;
         if($remain1 > $remain2){
             //プレイヤ1勝利時の処理
-            $plusminus = 0.5 * ($player2_point - $player1_point) + $remain1 * 100;
+            $plusminus = 5 * ($player2_point - $player1_point) + $remain1 * 50;
             $this->redis->zIncrBy('points', $plusminus, $player1['user']['screen_name']);
             $this->redis->zIncrBy('points', 0-$plusminus, $player2['user']['screen_name']);
-            print("player1の勝ちです¥n");
+            print("player1の勝ちです\n");
+
+
+            $this -> twOauth -> post("statuses/update", array("status" => "@".$player1['user']['screen_name']."さんが"."@".$player2['user']['screen_name']."さんに勝ちました".$this->getface()));
+
+
 
         } else if($remain2 > $remain1) {
             //プレイヤ2勝利時の処理
-            $plusminus = 0.5 * ($player1_point - $player2_point) + $remain2 * 100;
+            $plusminus = 5 * ($player1_point - $player2_point) + $remain2 * 100;
             $this->redis->zIncrBy('points', $plusminus, $player2['user']['screen_name']);
             $this->redis->zIncrBy('points', 0-$plusminus, $player1['user']['screen_name']);
-            print("player2の勝ちです¥n");
+            print("player2の勝ちです\n");
+
+
+            $this -> twOauth -> post("statuses/update", array("status" => "@".$player2['user']['screen_name']."さんが"."@".$player1['user']['screen_name']."さんに勝ちました".$this->getface()));
+
+
+        } else {
+            $this -> twOauth -> post("statuses/update", array("status" => "@".$player1['user']['screen_name']."さんと"."@".$player2['user']['screen_name']."さんのバトルは引き分けでした".$this->getface()));
         }
-        print("player1の残り文字数は".$remain1."です。¥player2の残り文字数は".$remain2."です。¥n");
+        print("player1の残り文字数は".$remain1."です。\n player2の残り文字数は".$remain2."です。\n");
         // redisにデータを入れる
     }
     function userdata($id, $text, $point){
@@ -169,9 +213,9 @@ class FilterTrackConsumer extends OauthPhirehose
         $point = $this->redis->zRank('points', $screen_name);
         if($point == null){
             //新規
-            $rate = 1000;
-            $this -> redis -> zAdd('points',1000, $screen_name);
-            print($screen_name."さんのデータを作ります。¥n");
+            $rate = 5000;
+            $this -> redis -> zAdd('points',$rate, $screen_name);
+            print($screen_name."さんのデータを作ります。\n");
         } else {
             //更新
             $rate = $this -> redis-> zScore('points', $screen_name);
@@ -179,17 +223,22 @@ class FilterTrackConsumer extends OauthPhirehose
 
         return array('screen_name' => $screen_name, 'point' => $rate);
     }
+    function getFace(){
+        $faceCount = count($this -> faces);
+        $key = mt_rand(0, $faceCount - 1);
+        return $this -> faces[$key];
+    }
 }
 
 
 // The OAuth credentials you received when registering your app at Twitter
-define("TWITTER_CONSUMER_KEY", "3cmPhfsazDRlxAF6BoVWXTtzO");
-define("TWITTER_CONSUMER_SECRET", "FscnbGsKYPZsljN8urD1UhnSHDkKXT9n05V6drtubbbzg0wH71");
+define("TWITTER_CONSUMER_KEY", "BoZZeo4GJNy2ZDh5NbCol9p8Y");
+define("TWITTER_CONSUMER_SECRET", "i8MakLAuVosAAdozFehfphHz57ZgbLQpF2Ubz8YGGA017gLchC");
 
 
 // The OAuth data for the twitter account
-define("OAUTH_TOKEN", "1003250335-pURU26X5R4K1UojCWz8qzcNrzh5tjP7jFIadeI3");
-define("OAUTH_SECRET", "SoGkPNluwJyo0Kym6Mwc3Gwfxm73jeYMLapFWk6B1McJf");
+define("OAUTH_TOKEN", "3187497205-umL3JDIrqeMCrPKImUdwPVY3qzsGn0QdL4sNkYo");
+define("OAUTH_SECRET", "bTzLh6XtHjUCYCGfXifxD4PBVV5UVCAYNO8zUDWmJZpuc");
 
 // Start streaming
 $sc = new FilterTrackConsumer(OAUTH_TOKEN, OAUTH_SECRET, Phirehose::METHOD_FILTER);
