@@ -1,0 +1,70 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-size: 18px;
+}
+
+body {
+    background-color: #000;
+    color:#fff;
+}
+
+.l-constrained {
+    width:980px;
+    margin:0 auto;
+}
+
+
+.l-header {
+    background-image: url(../bg.png);
+    height: 370px;
+}
+
+.h-logo {
+    text-align: center;
+}
+
+
+.button{
+    margin-top: 5px;
+    margin-bottom:5px;
+    width: 50px;
+    font-size: 15px;
+}
+#menu{
+    float:center;
+    margin-top: 15px;
+    margin-bottom:15px;
+    overflow:hidden;
+    color:#ffffffff;
+
+
+}
+#menu ul>li{
+    float: left;
+    width:170px;
+    font-size: 15px;
+    text-align:center;
+    padding: 5px;
+    background: #ccc;
+    margin-right:10px;
+    border-radius: 4px;
+    text-shadow: 0 1px 0 #fff;
+
+}
+
+.zokusei {
+    margin-left: 300px;
+}
+.taisen {
+    margin-left: 200px;
+}
+.ranking{
+    margin-left: 300px;
+
+}
+
+.ranking_battlecount{
+    margin-left: 300px;
+
+}

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.3.min.js"></script>
+    <script src="app.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Orbitron:400,500,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="css/style.css">
+    <title>TwitBattle -ホーム-</title>
+</head>
+<body>
+    <div class="l-header">
+        <div class="l-constrained">
+            <div class="h-logo">
+                <img src="logo.png" alt="">
+            </div>
+            <div id="menu">
+                <ul>
+                    <li><a href="index.html">ランキングホーム</a></li>
+                    <li><a href="rule.html">ゲームルール</a></li>
+                    <li><a href="https://twitter.com/TwitBattle_bot" target="_blank">Twitter Battle Bot</a></li>
+                    <li><a href="https://twitter.com/yuki_99_s" target="_blank">作成者 Twitter</a></li>
+                    <li><a href="http://www.rcc.ritsumei.ac.jp/" target="_blank">RCCブログ</a></li>
+                </ul>
+            </div><br>
+            <p><center>TwitBattleへようこそ。Twitterへ投稿した文字列同士で勝負を行います。</center></p>
+            <p><center>詳しくはゲームルールページをご覧ください。</center></p>
+            <p><center>※画像が表示されていない場合、リロードを数回行ってください。</p></center><br><br>
+        </div>
+    </div>
+    
+    <center><div class="l-content">
+        <p class ="user_result">TwitterIDの@以下を入力して送信ボタンを押してください。</p>
+        <p class ="user_point"></p>
+        <p class ="user_battle_count"></p>
+        <p class ="user_win_count"></p>
+        <p class ="user_win_rate"></p><br><br>
+        <p><input type = "text" class = "screen_name" name="screen_name" placeholder="TwitterIDの@以下を入力"></p>
+        <p><input type = "button" class = "button" name="決定ボタン" value="送信！"></p>
+        <br><br><br><br>
+
+        <h1><u>レート Ranking</u></h1></center><br>
+        <h2><ul class="ranking"></ul></h2>
+    <center><h1><u>対戦回数 Ranking</u></h1><br></center>
+    <h2><ul class="ranking_battlecount"></ul></h2>
+    </div>
+    <br><br><br><br><br><br><br>
+</body>
+</html>
