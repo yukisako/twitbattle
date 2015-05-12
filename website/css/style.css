@@ -60,11 +60,17 @@ body {
     margin-left: 200px;
 }
 .ranking{
-    margin-left: 300px;
+    margin-left: 400px;
 
 }
 
 .ranking_battlecount{
-    margin-left: 300px;
+    margin-left: 400px;
+}
 
+.ranking_wincount{
+    margin-left: 400px;
+}
+.ranking_winrate{
+    margin-left: 400px;
 }

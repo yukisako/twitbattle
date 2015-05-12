@@ -45,6 +45,52 @@
         $result[$screen_name]['win_rate'] = $win_rate;
     }
     $response['battle_count'] = $result;
+
+
+
+
+$ranking_battlecount = $redis -> sort('points', array(
+    'sort' => 'asc',
+    'limit' => '0, 30',
+    'by' => '*->win_count'
+));
+$result = array();
+foreach($ranking_battlecount as $screen_name){
+    $win_count = $redis -> hGet($screen_name, "win_count");
+    $battle_count = $redis -> hGet($screen_name, "battle_count");
+    $win_rate = $redis -> hGet($screen_name, "win_rate");
+    $point = $redis -> zScore("points",$screen_name);
+
+    $result[$screen_name] = array();
+    $result[$screen_name]['point'] = $point;
+    $result[$screen_name]['win_count'] = $win_count;
+    $result[$screen_name]['battle_count'] = $battle_count;
+    $result[$screen_name]['win_rate'] = $win_rate;
+}
+$response['win_count'] = $result;
+
+
+$ranking_battlecount = $redis -> sort('points', array(
+    'sort' => 'asc',
+    'limit' => '0, 30',
+    'by' => '*->win_rate'
+));
+$result = array();
+foreach($ranking_battlecount as $screen_name){
+    $win_count = $redis -> hGet($screen_name, "win_count");
+    $battle_count = $redis -> hGet($screen_name, "battle_count");
+    $win_rate = $redis -> hGet($screen_name, "win_rate");
+    $point = $redis -> zScore("points",$screen_name);
+
+    $result[$screen_name] = array();
+    $result[$screen_name]['point'] = $point;
+    $result[$screen_name]['win_count'] = $win_count;
+    $result[$screen_name]['battle_count'] = $battle_count;
+    $result[$screen_name]['win_rate'] = $win_rate;
+}
+$response['win_rate'] = $result;
+
+
     echo json_encode($response);
 /*
   //  echo json_encode($ranking);

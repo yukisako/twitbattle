@@ -14,6 +14,18 @@ $(document).ready(function() {
             var str = "<li>"+i+":　レート "+v['point']+"　対戦回数"+v['battle_count']+"回　勝利回数"+v['win_count']+"回　勝率"+v['win_rate']+"%</li><br>";
             $(".ranking_battlecount").prepend(str);
         });
+        $.each(ranking['win_count'],function(i, v) {
+            //var str = "<li>"+i+": "+v+" point<li>";
+            console.log(v);
+            var str = "<li>"+i+":　レート "+v['point']+"　対戦回数"+v['battle_count']+"回　勝利回数"+v['win_count']+"回　勝率"+v['win_rate']+"%</li><br>";
+            $(".ranking_wincount").prepend(str);
+        });
+        $.each(ranking['win_rate'],function(i, v) {
+            //var str = "<li>"+i+": "+v+" point<li>";
+            console.log(v);
+            var str = "<li>"+i+":　レート "+v['point']+"　対戦回数"+v['battle_count']+"回　勝利回数"+v['win_count']+"回　勝率"+v['win_rate']+"%</li><br>";
+            $(".ranking_winrate").prepend(str);
+        });
     });
     $(".button").on('click', function () {
 
